@@ -15,10 +15,16 @@ struct ContentView: View {
     
     @State private var moves: [Move?] = Array(repeating: nil, count: 9)
     @State private var isBoardDisabled: Bool = false
+    @State private var alertItem: AlertItem?
     
     var body: some View {
         GeometryReader { geometry in
             VStack{
+                Spacer()
+                
+                Text("Tic Tac Toe")
+                    .font(.system(size: 50, weight: .semibold, design: .default))
+                
                 Spacer()
                 
                 LazyVGrid(columns: columns, spacing: 5) {
@@ -40,12 +46,12 @@ struct ContentView: View {
                             isBoardDisabled = true
                             
                             if checkWinCondition(for: .human, in: moves) {
-                                print("Human wins")
+                                alertItem = AlertContext.humanWins
                                 return
                             }
                             
                             if checkDrawCondition(in: moves) {
-                                print("Draw")
+                                alertItem = AlertContext.draw
                                 return
                             }
                             
@@ -55,12 +61,12 @@ struct ContentView: View {
                                 isBoardDisabled = false
                                 
                                 if checkWinCondition(for: .computer, in: moves) {
-                                    print("Computer wins")
+                                    alertItem = AlertContext.computerWins
                                     return
                                 }
                                 
                                 if checkDrawCondition(in: moves) {
-                                    print("Draw")
+                                    alertItem = AlertContext.draw
                                     return
                                 }
                             }
@@ -71,6 +77,12 @@ struct ContentView: View {
             }
             .disabled(isBoardDisabled)
             .padding()
+            .alert(item: $alertItem, content: { alertItem in
+                Alert(title: alertItem.title,
+                      message: alertItem.message,
+                      dismissButton: .default(alertItem.buttonTitle, action: { resetGame() }))
+
+            })
         }
     }
     
@@ -113,6 +125,11 @@ struct ContentView: View {
     
     func checkDrawCondition(in moves: [Move?]) -> Bool {
         return moves.compactMap{ $0 }.count == 9
+    }
+    
+    func resetGame() {
+        moves = Array(repeating: nil, count: 9)
+        isBoardDisabled = false
     }
     
 }
