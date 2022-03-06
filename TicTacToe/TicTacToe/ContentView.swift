@@ -22,29 +22,36 @@ struct ContentView: View {
                 Spacer()
                 
                 LazyVGrid(columns: columns, spacing: 5) {
-                    ForEach(0..<9) { i in
+                    ForEach(0..<9) { index in
                         ZStack {
                             Circle()
                                 .foregroundColor(.blue).opacity(0.7)
                                 .frame(width: geometry.size.width / 3 - 15, height: geometry.size.width / 3 - 15)
                                 .shadow(radius: 5)
                             
-                            Image(systemName: moves[i]?.indicator ?? "")
+                            Image(systemName: moves[index]?.indicator ?? "")
                                 .resizable()
                                 .frame(width: 40, height: 40)
                                 .foregroundColor(.white)
                         }
                         .onTapGesture {
-                            moves[i] = Move(player: isHumanTurn ? .human : .computer, boardIndex: i)
+                            if isSquareOccupied(in: moves, for: index) {return}
+                            moves[index] = Move(player: isHumanTurn ? .human : .computer, boardIndex: index)
                             isHumanTurn.toggle()
                         }
                     }
-                    .padding()
                 }
+                .padding()
+                
                 Spacer()
             }
         }
     }
+    
+    func isSquareOccupied(in moves: [Move?], for index: Int) -> Bool {
+        return moves.contains(where: {$0?.boardIndex == index})
+    }
+    
 }
 
 enum Player {
